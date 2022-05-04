@@ -1,5 +1,12 @@
 # debug-async-io
 
+At the moment, this isn't working as I was trying to
+add test_async_io but was unable to integrate with my
+simple-executor as spawner.spawn of simple-executor
+doesn't return a future. I'm not sure how to resolve
+this so stopping developement for now.
+
+
 I’ve had trouble getting the [hole_punching](https://docs.rs/libp2p/0.44.0/libp2p/tutorials/hole_punching/index.html) working.
 in step 3 of the “[Setting up the relay server](https://docs.rs/libp2p/0.44.0/libp2p/tutorials/hole_punching/index.html#setting-up-the-relay-server)”
 I run a debug build of the relay server on a Digital Ocean VM with 1CPU, 1GB RAM and 25GB SSD using
