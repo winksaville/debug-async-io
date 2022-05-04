@@ -1,10 +1,13 @@
 #![feature(thread_id_value)]
 
+mod test_async_io;
+
 use simple_executor::{executor::*, timer::*};
+use test_async_io::not_missing_wake;
 
 use std::{io::Write, time::Duration};
 
-fn env_logger_init() {
+pub(crate) fn env_logger_init() {
     let env = env_logger::Env::default();
     env_logger::Builder::from_env(env)
         .format(|buf, record| {
@@ -27,10 +30,7 @@ fn env_logger_init() {
         .init();
 }
 
-fn main() {
-    env_logger_init();
-    log::trace!("main:+");
-
+fn use_simple_executor() {
     let (executor, spawner) = new_executor_and_spawner();
 
     const DELAY_MS: u64 = 500;
@@ -57,6 +57,14 @@ fn main() {
         Ok(elapsed) => assert!(elapsed >= Duration::from_millis(DELAY_MS)),
         Err(e) => panic!("{}", e),
     }
+}
+
+fn main() {
+    env_logger_init();
+    log::trace!("main:+");
+
+    //use_simple_executor();
+    not_missing_wake();
 
     log::trace!("main:-");
 }

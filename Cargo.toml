@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 async-io = { version = "1.6.0", path = "../async-io" }
 env_logger = "0.9.0"
+futures-lite = "1.12.0"
 humantime = "2.1.0"
 log = "0.4.17"
 simple-executor = { version = "0.1.0", path = "../simple-executor" }
