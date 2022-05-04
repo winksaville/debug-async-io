@@ -104,6 +104,62 @@ and the corresponding async-io is [Add-debug-v11](https://github.com/winksaville
 I've added a [`[patch.cartes-io]` section to `libp2p/Cargo.toml`](https://github.com/winksaville/rust-libp2p/blob/Debug-relay_v2-ok.v1/Cargo.toml#L175-L178)
 which has libp2p use that version of async-io. As you can see I also used special versions of the netlink and polling crates.
 
+## Building and running
+
+You should be able to clone the repo and then build and run with:
+```
+wink@3900x 22-05-04T18:17:09.631Z:~/prgs/rust/myrepos/debug-async-io (main)
+$ RUST_LOG=trace cargo run -- --show-output
+    Finished dev [unoptimized + debuginfo] target(s) in 0.01s
+     Running `target/debug/debug-async-io --show-output`
+[2022-05-04T18:17:21.344572Z TRACE debug_async_io 21  1] main:+
+Hello, world!
+[2022-05-04T18:17:21.344594Z TRACE debug_async_io 25  1] main:-
+```
+
+Of note the logged not the default:
+```
+[2022-05-04T18:17:21.344572Z TRACE debug_async_io 21  1] main:+
+``
+The data in `[]` is from a custom formatter in `main.rs`:
+```
+fn env_logger_init() {
+    let env = env_logger::Env::default();
+    env_logger::Builder::from_env(env).format(|buf, record| {
+        let time = std::time::SystemTime::now();
+        writeln!(buf, "[{} {:5} {} {} {:2}] {}",
+            humantime::format_rfc3339_micros(time),
+            record.level(),
+            if let Some(s) = record.module_path_static() { s } else { "" },
+            if let Some(v) = record.line() { v } else { 0 },
+            std::thread::current().id().as_u64(),
+            record.args())
+    }).init();
+}
+```
+And the first executable line `main` invokes `env_logger_init`:
+```
+fn main() {
+    env_logger_init();
+    log::trace!("main:+");
+
+    println!("Hello, world!");
+
+    log::trace!("main:-");
+}
+```
+As you can see in env_logger_init the contents of the header, `[]` is:
+- UTC time in rfc3339 with micro second precision, `2022-05-04T18:17:21.344572Z`
+- record.level, `TRACE`
+- module_path, `debug_async_io`
+- line number of the log statement, `21`
+- thread id as an integer, `1`
+
+Because I'm using `as_u64()` to output the thread id integer I need
+to use an unstable version for the rust compiler and I'm using `nightly`.
+To make this the default I've added `rust-toolchain.toml` to the project
+with `channel=nightly`.
+
 ## License
 
 Licensed under either of
